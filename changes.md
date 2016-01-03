@@ -1,3 +1,12 @@
+## v0.5.1 - January 3rd, 2016
+
+```clojure
+[matthiasn/systems-toolbox-kafka "0.5.1"]
+```
+
+* versioning scheme changed to match minor version of systems-toolbox
+
+
 ## v0.1.2 - January 3rd, 2016
 
 ```clojure
