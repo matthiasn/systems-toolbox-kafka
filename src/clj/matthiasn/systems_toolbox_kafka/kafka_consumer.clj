@@ -28,15 +28,15 @@
     [put-fn]
     (let [zk-client (admin/zk-client zookeper-address {:session-timeout-ms    500
                                                        :connection-timeout-ms 500})]
-      (let [consumer (kcz/consumer config)
-            topics (:topics cfg)]
+      (let [topics (:topics cfg)]
         (doseq [topic topics]
           (when-not (admin/topic-exists? zk-client topic)
             (log/info "Created Kafka topic:" topic)
             (admin/create-topic zk-client topic))
           (log/info "Listening to Kafka topic:" topic)
           (future
-            (let [messages (kcz/messages consumer topic)]
+            (let [consumer (kcz/consumer config)
+                  messages (kcz/messages consumer topic)]
               (doseq [msg messages]
                 (try
                   (let [thawed (nippy/thaw (:value msg))
@@ -45,7 +45,7 @@
                         msg-meta (:msg-meta thawed)]
                     (put-fn (with-meta [msg-type msg-payload] (or msg-meta {}))))
                   (catch Exception ex (log/error "Error while taking message off Kafka topic:" ex)))))))
-        {:state (atom {:consumer consumer})}))))
+        {:state (atom {})}))))
 
 (defn cmp-map
   "Creates Kafka consumer component.

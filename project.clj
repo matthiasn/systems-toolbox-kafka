@@ -1,4 +1,4 @@
-(defproject matthiasn/systems-toolbox-kafka "0.1.1"
+(defproject matthiasn/systems-toolbox-kafka "0.1.2"
   :description "Kafka producer and consumer components for systems-toolbox"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "Eclipse Public License"
