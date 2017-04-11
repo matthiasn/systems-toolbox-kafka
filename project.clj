@@ -1,4 +1,4 @@
-(defproject matthiasn/systems-toolbox-kafka "0.5.1"
+(defproject matthiasn/systems-toolbox-kafka "0.6.1"
   :description "Kafka producer and consumer components for systems-toolbox"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "Eclipse Public License"
@@ -6,9 +6,12 @@
 
   :source-paths ["src/clj"]
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/tools.logging "0.3.1"]
-                 [clj-kafka "0.3.4"]
-                 [com.taoensso/nippy "2.11.0-beta1"]]
+  :dependencies [[org.clojure/tools.logging "0.3.1"]
+                 [org.clojure/core.async "0.3.442"]
+                 [spootnik/kinsky "0.1.16" :exclusions [org.clojure/core.async]]]
 
-  :plugins [[lein-codox "0.9.1" :exclusions [org.clojure/clojure]]])
+  :profiles {:dev {:dependencies [[org.clojure/clojure "1.9.0-alpha15"]
+                                  [matthiasn/systems-toolbox "0.6.6"]]}}
+
+  :plugins [[lein-codox "0.10.3" :exclusions [org.clojure/clojure]]
+            [lein-ancient "0.6.10"]])

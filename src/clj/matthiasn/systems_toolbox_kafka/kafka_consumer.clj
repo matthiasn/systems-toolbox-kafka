@@ -1,21 +1,8 @@
 (ns matthiasn.systems-toolbox-kafka.kafka-consumer
-  (:gen-class)
-  (:require
-    [clojure.tools.logging :as log]
-    [clj-kafka.consumer.zk :as kcz]
-    [clj-kafka.admin :as admin]
-    [taoensso.nippy :as nippy]))
-
-(def zookeper-address (get (System/getenv) "ZOOKEEPER_ADDRESS" "127.0.0.1:2181"))
-(def kafka-consumer-id (get (System/getenv) "KAFKA_CONSUMER_ID" "clj-kafka.consumer"))
-(def kafka-port (get (System/getenv) "KAFKA_PORT" "9092"))
-
-(def config
-  {"zookeeper.connect"  zookeper-address
-   "group.id"           kafka-consumer-id
-   "port"               kafka-port
-   "auto.offset.reset"  "smallest"
-   "auto.commit.enable" "true"})
+  (:require [clojure.tools.logging :as log]
+            [kinsky.client :as client]
+            [kinsky.async :as ka]
+            [clojure.core.async :as a]))
 
 (defn kafka-consumer-state-fn
   "Returns function that creates the Kafka consumer component state state while using provided
@@ -24,28 +11,23 @@
   from config. Note that messages taken off the topics need to be sent by the systems-toolbox,
   encoded by Nippy."
   [cfg]
-  (fn
-    [put-fn]
-    (let [zk-client (admin/zk-client zookeper-address {:session-timeout-ms    500
-                                                       :connection-timeout-ms 500})]
-      (let [topics (:topics cfg)]
-        (doseq [topic topics]
-          (when-not (admin/topic-exists? zk-client topic)
-            (log/info "Created Kafka topic:" topic)
-            (admin/create-topic zk-client topic))
-          (log/info "Listening to Kafka topic:" topic)
-          (future
-            (let [consumer (kcz/consumer config)
-                  messages (kcz/messages consumer topic)]
-              (doseq [msg messages]
-                (try
-                  (let [thawed (nippy/thaw (:value msg))
-                        msg-type (:msg-type thawed)
-                        msg-payload (:msg-payload thawed)
-                        msg-meta (:msg-meta thawed)]
-                    (put-fn (with-meta [msg-type msg-payload] (or msg-meta {}))))
-                  (catch Exception ex (log/error "Error while taking message off Kafka topic:" ex)))))))
-        {:state (atom {})}))))
+  (fn [put-fn]
+    (log/info "Starting Kafka consumer" cfg)
+    (let [[out ctl] (ka/consumer (:client-cfg cfg)
+                                 (client/keyword-deserializer)
+                                 (client/edn-deserializer))
+          topic (:topic cfg)]
+      (a/go-loop []
+        (when-let [msg (a/<! out)]
+          (try
+            (when-let [value (:value msg)]
+              (let [{:keys [msg-type msg-payload msg-meta]} value]
+                (log/debug "Received message on Kafka topic" msg)
+                (put-fn (with-meta [msg-type msg-payload] (or msg-meta {})))))
+            (catch Exception ex (log/error "Error while taking message off Kafka topic:" ex)))
+          (recur)))
+      (a/put! ctl {:op :subscribe :topic topic})
+      {:state (atom {})})))
 
 (defn cmp-map
   "Creates Kafka consumer component.
@@ -58,5 +40,6 @@
   topics, or for returning component stats."
   {:added "0.4.9"}
   [cmp-id cfg]
-  {:cmp-id   cmp-id
-   :state-fn (kafka-consumer-state-fn cfg)})
+  {:cmp-id      cmp-id
+   :state-fn    (kafka-consumer-state-fn cfg)
+   :handler-map {}})
