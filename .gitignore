@@ -12,3 +12,6 @@ pom.xml.asc
 .nrepl-port
 *.iml
 .idea/
+test2junit/
+build.xml
+logs/

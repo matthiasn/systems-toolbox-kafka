@@ -15,8 +15,8 @@
 
   Borrowed from: https://github.com/otto-de/tesla-microservice"
   [form & {:keys [timeout interval]
-           :or   {timeout  10000
-                  interval 100}}]
+           :or   {timeout  15000
+                  interval 500}}]
   `(let [start-time# (System/currentTimeMillis)]
      (loop []
        (let [last-stats# (atom nil)
