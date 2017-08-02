@@ -43,6 +43,5 @@
     </root>
 
     <logger name="matthiasn.systems-toolbox-kafka" level="ALL"/>
-    <logger name="matthiasn.systems-toolbox" level="ALL"/>
 
 </configuration>

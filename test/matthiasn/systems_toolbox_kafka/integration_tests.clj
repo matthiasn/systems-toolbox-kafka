@@ -25,7 +25,7 @@
                       :state-fn    (fn [_put-fn] {:state rcv-state})
                       :handler-map {:test/msg test-handler}}
         test-msgs (mapv (fn [n] [:test/msg {:a n :b (rand-int 100)}])
-                        (range 1000))]
+                        (range 100))]
     (sb/send-mult-cmd sb
                       [[:cmd/init-comp
                         #{(kc/cmp-map :test/consumer kafka-cfg)
@@ -35,7 +35,7 @@
                        [:cmd/route {:from :test/consumer
                                     :to   :test/inbox}]])
 
-    (Thread/sleep 1000)
+    (Thread/sleep 5000)
 
     (doseq [m test-msgs]
       (mh/send-msg sb
@@ -43,7 +43,7 @@
                                :msg m}]))
 
     (testing "it should send and receive message via Kafka"
-      (eventually (= 1000 (count (:received @rcv-state))))
+      (eventually (= 100 (count (:received @rcv-state))))
       (eventually (= test-msgs (:received @rcv-state))))
 
     (testing "meta-data on message is preserved"
