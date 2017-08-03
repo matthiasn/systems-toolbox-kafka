@@ -7,6 +7,20 @@
            (org.apache.kafka.common.metrics KafkaMetric)
            (java.util Map)))
 
+(defn send-message
+  "Forwards parsed message. Logs error when there#s a problem."
+  [msg-string put-fn]
+  (try
+    (let [parsed (read-string msg-string)
+          {:keys [msg-type msg-payload msg-meta]} parsed]
+      (if msg-type
+        (let [msg (with-meta [msg-type msg-payload] (or msg-meta {}))]
+          (log/debug "Received message on Kafka topic" msg)
+          (put-fn msg))
+        (log/error "Don't know what to do with message:" parsed)))
+    (catch Throwable e
+      (log/error e "Exception when handling message:" msg-string))))
+
 (defn kafka-consumer-state-fn
   "Returns function that creates the Kafka consumer component state, using the
    provided configuration."
@@ -23,15 +37,8 @@
           (while (not @shutdown)
             (let [^ConsumerRecords records (.poll consumer 100)]
               (doseq [^ConsumerRecord record records]
-                (let [value (read-string (.value record))
-                      {:keys [msg-type msg-payload msg-meta]} value
-                      msg (with-meta [msg-type msg-payload] (or msg-meta {}))]
-                  (log/debug "Received message on Kafka topic" msg)
-                  (put-fn msg)))
-              ;(update-lag-gauge current-lag records consumer)
-              ;(update-reserve-gauge current-reserve records consumer)
-              ))
-          (catch Exception e
+                (send-message (.value record) put-fn))))
+          (catch Throwable e
             (log/error e "Going to stop consuming because of this exception."))
           (finally (.close consumer))))
       {:state (atom {})})))
