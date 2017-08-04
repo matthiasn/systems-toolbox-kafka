@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.6.4] - 2017-08-04
+### Changed
+- 0.10.x for now
+
+## [0.6.3] - 2017-08-03
+### Changed
+- better error handling
+
 ## [0.6.2] - 2017-08-02
 ### Changed
 - use Kafka 0.11.x via Java client
