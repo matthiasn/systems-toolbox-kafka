@@ -15,7 +15,7 @@
           {:keys [msg-type msg-payload msg-meta]} parsed]
       (if msg-type
         (let [msg (with-meta [msg-type msg-payload] (or msg-meta {}))]
-          (log/debug "Received message on Kafka topic" msg)
+          (log/info "Received message on Kafka topic" msg)
           (put-fn msg))
         (log/error "Don't know what to do with message:" parsed)))
     (catch Throwable e
@@ -26,11 +26,12 @@
    provided configuration."
   [cfg]
   (fn [put-fn]
-    (log/info "Starting Kafka consumer" cfg)
     (let [kafka-cfg (u/config->kafka-config cfg)
+          _ (log/info "Starting Kafka consumer" kafka-cfg)
           consumer (KafkaConsumer. ^Map kafka-cfg (StringDeserializer.) (StringDeserializer.))
           topic (:topic cfg)
           shutdown (atom false)]
+      (log/debug "Started Kafka consumer" consumer)
       (.subscribe consumer [topic])
       (a/thread
         (try
@@ -40,7 +41,9 @@
                 (send-message (.value record) put-fn))))
           (catch Throwable e
             (log/error e "Going to stop consuming because of this exception."))
-          (finally (.close consumer))))
+          (finally
+            (log/info "closing Kafka consumer")
+            (.close consumer))))
       {:state (atom {})})))
 
 (defn cmp-map

@@ -9,8 +9,7 @@
             [matthiasn.systems-toolbox.component.helpers :as h]))
 
 (def kafka-cfg {:cfg         {:bootstrap-servers "localhost:9092"
-                              :group-id          (h/make-uuid)
-                              :topic             "test-topic"}
+                              :topic             "test-topic1"}
                 :relay-types #{:test/msg}})
 
 (s/def :test/msg (s/map-of keyword? number?))

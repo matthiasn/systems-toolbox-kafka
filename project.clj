@@ -1,4 +1,4 @@
-(defproject matthiasn/systems-toolbox-kafka "0.6.4"
+(defproject matthiasn/systems-toolbox-kafka "0.6.5"
   :description "Kafka producer and consumer components for systems-toolbox"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "Eclipse Public License"
@@ -11,7 +11,15 @@
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.9.0-alpha17"]
                                   [org.clojure/tools.logging "0.4.0"]
                                   [ch.qos.logback/logback-classic "1.2.3"]
-                                  [matthiasn/systems-toolbox "0.6.10"]]}}
+                                  [matthiasn/systems-toolbox "0.6.10"]]
+                   :exclusions [org.slf4j/slf4j-nop
+                                commons-logging
+                                log4j/log4j
+                                org.slf4j/slf4j-log4j12]
+                   :jvm-opts     ["-Dlog_appender=consoleAppender"
+                                  "-Dlog_level=DEBUG"
+                                  "-XX:-OmitStackTraceInFastThrow"]}}
+
 
   :plugins [[lein-codox "0.10.3" :exclusions [org.clojure/clojure]]
             [test2junit "1.3.3"]

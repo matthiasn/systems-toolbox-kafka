@@ -11,7 +11,7 @@
 (defn publish-msg
   "Publishes messages on Kafka topic when the msg-type-to-topic mapping contains
   the msg-type. Messages on the topic contain metadata for the systems-toolbox
-  message and are serialized using Nippy."
+  message."
   [{:keys [current-state msg-type msg-meta msg-payload]}]
   (let [prod (:prod current-state)
         topic (-> current-state :cfg :topic)
@@ -30,6 +30,7 @@
   (fn [put-fn]
     (let [kafka-cfg (u/config->kafka-config cfg)
           prod (KafkaProducer. kafka-cfg (StringSerializer.) (StringSerializer.))]
+      (log/info "Starting Kafka producer with config" kafka-cfg)
       {:state (atom {:prod prod
                      :cfg  cfg})})))
 
