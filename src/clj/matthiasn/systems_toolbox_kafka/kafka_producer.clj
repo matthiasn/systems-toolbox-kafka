@@ -3,10 +3,20 @@
             [matthiasn.systems-toolbox-kafka.utils :as u]
             [clojure.string :as str]
             [clojure.spec.alpha :as s])
-  (:import (org.apache.kafka.clients.producer KafkaProducer ProducerRecord)
+  (:import (org.apache.kafka.clients.producer KafkaProducer ProducerRecord Callback RecordMetadata)
            (org.apache.kafka.common.serialization StringDeserializer StringSerializer)
            (org.apache.kafka.common.metrics KafkaMetric)
            (java.util Map)))
+
+(defn metadata->map
+  [metadata]
+  {:offset     (.offset metadata)
+   :timestamp  (.timestamp metadata)
+   :checksum   (.checksum metadata)
+   :key-size   (.serializedKeySize metadata)
+   :value-size (.serializedValueSize metadata)
+   :topic      (.topic metadata)
+   :partition  (.partition metadata)})
 
 (defn publish-msg
   "Publishes messages on Kafka topic when the msg-type-to-topic mapping contains
@@ -18,9 +28,14 @@
         serialized {:msg-type    msg-type
                     :msg-meta    msg-meta
                     :msg-payload msg-payload}
-        pr (ProducerRecord. topic (pr-str serialized))]
-    (log/debug "Publishing message on topic" topic serialized)
-    (.send prod pr)
+        pr (ProducerRecord. topic (pr-str serialized))
+        callback (reify Callback
+                   (onCompletion [this metadata exception]
+                     (log/debug "publish callback:" (metadata->map metadata) exception)
+                     (when exception
+                       (log/error "publish failed:" exception))))]
+    (log/info "Publishing message on topic" topic serialized)
+    (.send prod pr callback)
     {}))
 
 (defn kafka-producer-state-fn

@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.6.8] - 2017-08-08
+### Changed
+- callback debug logging
+- error logging when exception in callback
+
 ## [0.6.5] - 2017-08-08
 ### Changed
 - random group id when not set

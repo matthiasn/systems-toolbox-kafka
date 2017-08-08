@@ -31,7 +31,7 @@
           consumer (KafkaConsumer. ^Map kafka-cfg (StringDeserializer.) (StringDeserializer.))
           topic (:topic cfg)
           shutdown (atom false)]
-      (log/debug "Started Kafka consumer" consumer)
+      (log/info "Started Kafka consumer" consumer)
       (.subscribe consumer [topic])
       (a/thread
         (try
