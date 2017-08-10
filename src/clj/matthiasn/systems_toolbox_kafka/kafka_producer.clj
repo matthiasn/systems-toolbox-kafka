@@ -34,7 +34,7 @@
                      (log/debug "publish callback:" (metadata->map metadata) exception)
                      (when exception
                        (log/error "publish failed:" exception))))]
-    (log/info "Publishing message on topic" topic serialized)
+    (log/debug "Publishing message on topic" topic serialized)
     (.send prod pr callback)
     {}))
 

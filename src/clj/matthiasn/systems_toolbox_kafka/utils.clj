@@ -5,7 +5,8 @@
 
 (s/def ::bootstrap-servers string?)
 (s/def ::group-id string?)
-(s/def ::topic string?)
+(s/def ::topic (s/or :topic string?
+                     :topics (s/coll-of string?)))
 
 (s/def ::cfg
   (s/keys :req-un [::bootstrap-servers

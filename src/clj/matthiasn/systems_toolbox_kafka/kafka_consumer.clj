@@ -15,7 +15,7 @@
           {:keys [msg-type msg-payload msg-meta]} parsed]
       (if msg-type
         (let [msg (with-meta [msg-type msg-payload] (or msg-meta {}))]
-          (log/info "Received message on Kafka topic" msg)
+          (log/debug "Received message on Kafka topic" msg)
           (put-fn msg))
         (log/error "Don't know what to do with message:" parsed)))
     (catch Throwable e
