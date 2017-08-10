@@ -8,7 +8,7 @@
            (java.util Map)))
 
 (defn send-message
-  "Forwards parsed message. Logs error when there#s a problem."
+  "Forwards parsed message. Logs error when there's a problem."
   [msg-string put-fn]
   (try
     (let [parsed (read-string msg-string)
@@ -30,9 +30,10 @@
           _ (log/info "Starting Kafka consumer" kafka-cfg)
           consumer (KafkaConsumer. ^Map kafka-cfg (StringDeserializer.) (StringDeserializer.))
           topic (:topic cfg)
+          topics (if (vector? topic) topic [topic])
           shutdown (atom false)]
-      (log/info "Started Kafka consumer" consumer)
-      (.subscribe consumer [topic])
+      (log/info "Started Kafka consumer" topics consumer)
+      (.subscribe consumer topics)
       (a/thread
         (try
           (while (not @shutdown)

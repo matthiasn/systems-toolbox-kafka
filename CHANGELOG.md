@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.6.9] - 2017-08-10
+### Changed
+- multiple topics
+
 ## [0.6.8] - 2017-08-08
 ### Changed
 - callback debug logging
