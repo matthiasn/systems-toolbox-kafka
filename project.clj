@@ -1,4 +1,4 @@
-(defproject matthiasn/systems-toolbox-kafka "0.6.12"
+(defproject matthiasn/systems-toolbox-kafka "0.6.13"
   :description "Kafka producer and consumer components for systems-toolbox"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "Eclipse Public License"
@@ -6,9 +6,10 @@
 
   :source-paths ["src/clj"]
 
-  :dependencies [[org.apache.kafka/kafka_2.11 "0.10.1.1"]]
+  :dependencies [[org.apache.kafka/kafka_2.11 "0.10.1.1"]
+                 [com.cognitect/transit-clj "0.8.300"]]
 
-  :profiles {:dev {:dependencies [[org.clojure/clojure "1.9.0-alpha18"]
+  :profiles {:dev {:dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                                   [org.clojure/tools.logging "0.4.0"]
                                   [ch.qos.logback/logback-classic "1.2.3"]
                                   [matthiasn/systems-toolbox "0.6.11"]]

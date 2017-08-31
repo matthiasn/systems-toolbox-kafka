@@ -1,12 +1,15 @@
-(ns matthiasn.systems-toolbox-kafka.kafka-producer
+(ns matthiasn.systems-toolbox-kafka.kafka-producer2
   (:require [clojure.tools.logging :as log]
             [matthiasn.systems-toolbox-kafka.utils :as u]
             [clojure.string :as str]
+            [cognitect.transit :as transit]
             [clojure.spec.alpha :as s])
   (:import [org.apache.kafka.clients.producer KafkaProducer ProducerRecord Callback]
-           [org.apache.kafka.common.serialization StringDeserializer StringSerializer]
+           [org.apache.kafka.common.serialization ByteArrayDeserializer ByteArraySerializer]
            [org.apache.kafka.common.metrics KafkaMetric]
-           [java.util Map]))
+           [java.util Map]
+           [java.io ByteArrayInputStream ByteArrayOutputStream]))
+
 
 (defn metadata->map
   [metadata]
@@ -25,16 +28,20 @@
   [{:keys [current-state msg-type msg-meta msg-payload]}]
   (let [prod (:prod current-state)
         topic (-> current-state :cfg :topic)
-        serialized {:msg-type    msg-type
+        serializable {:msg-type    msg-type
                     :msg-meta    msg-meta
                     :msg-payload msg-payload}
-        pr (ProducerRecord. topic (pr-str serialized))
+        out (ByteArrayOutputStream. 4096)
+        writer (transit/writer out :json)
+        _ (transit/write writer serializable)
+        pr (ProducerRecord. topic (.toByteArray out))
         callback (reify Callback
                    (onCompletion [this metadata exception]
                      (log/debug "publish callback:" (metadata->map metadata) exception)
                      (when exception
                        (log/error "publish failed:" exception))))]
-    (log/debug "Publishing message on topic" topic serialized)
+    (.close out)
+    (log/debug "Publishing message on topic" topic serializable)
     (.send prod pr callback)
     {}))
 
@@ -44,7 +51,7 @@
   [cfg]
   (fn [put-fn]
     (let [kafka-cfg (u/config->kafka-config cfg)
-          prod (KafkaProducer. kafka-cfg (StringSerializer.) (StringSerializer.))]
+          prod (KafkaProducer. kafka-cfg (ByteArraySerializer.) (ByteArraySerializer.))]
       (log/info "Starting Kafka producer with config" kafka-cfg)
       {:state (atom {:prod prod
                      :cfg  cfg})})))
