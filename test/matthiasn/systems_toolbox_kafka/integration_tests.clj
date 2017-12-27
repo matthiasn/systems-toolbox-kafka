@@ -33,7 +33,6 @@
 
                        [:cmd/route {:from :test/consumer
                                     :to   :test/inbox}]])
-
     (Thread/sleep 5000)
 
     (doseq [m test-msgs]
@@ -49,5 +48,5 @@
       (let [msg-meta (meta (last (:received @rcv-state)))]
         (eventually (= #{:cmp-seq :corr-id :tag :test/inbox :test/consumer :test/producer}
                        (set (keys msg-meta))))
-        (eventually (= [:test/producer :test/inbox]
+        (eventually (= [:test/producer :test/consumer :test/inbox]
                        (:cmp-seq msg-meta)))))))

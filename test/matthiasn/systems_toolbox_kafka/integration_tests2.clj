@@ -5,8 +5,7 @@
             [matthiasn.systems-toolbox.component.msg-handling :as mh]
             [matthiasn.systems-toolbox-kafka.kafka-consumer2 :as kc]
             [matthiasn.systems-toolbox-kafka.kafka-producer2 :as kp]
-            [clojure.spec.alpha :as s]
-            [matthiasn.systems-toolbox.component.helpers :as h]))
+            [clojure.spec.alpha :as s]))
 
 (def kafka-cfg {:cfg         {:bootstrap-servers "localhost:9092"
                               :topic             "test-topic2"}
@@ -49,5 +48,5 @@
       (let [msg-meta (meta (last (:received @rcv-state)))]
         (eventually (= #{:cmp-seq :corr-id :tag :test/inbox :test/consumer :test/producer}
                        (set (keys msg-meta))))
-        (eventually (= [:test/producer :test/inbox]
+        (eventually (= [:test/producer :test/consumer :test/inbox]
                        (:cmp-seq msg-meta)))))))
