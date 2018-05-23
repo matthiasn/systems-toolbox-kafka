@@ -46,7 +46,14 @@
 
     (testing "meta-data on message is preserved"
       (let [msg-meta (meta (last (:received @rcv-state)))]
-        (eventually (= #{:cmp-seq :corr-id :tag :test/inbox :test/consumer :test/producer}
+        (eventually (= #{:cmp-seq
+                         :corr-id
+                         :system-info
+                         :tag
+                         :tag-ts
+                         :test/consumer
+                         :test/inbox
+                         :test/producer}
                        (set (keys msg-meta))))
         (eventually (= [:test/producer :test/consumer :test/inbox]
                        (:cmp-seq msg-meta)))))))

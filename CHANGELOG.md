@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.6.17] - 2018-05-23
+### Changed
+- dependencies
+
 ## [0.6.14] - 2017-12-27
 ### Changed
 - latest dependencies
