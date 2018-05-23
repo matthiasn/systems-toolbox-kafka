@@ -1,4 +1,4 @@
-(defproject matthiasn/systems-toolbox-kafka "0.6.17"
+(defproject matthiasn/systems-toolbox-kafka "0.6.18"
   :description "Kafka producer and consumer components for systems-toolbox"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "Eclipse Public License"
@@ -8,7 +8,7 @@
 
   :dependencies [[org.apache.kafka/kafka_2.11 "1.1.0"]
                  [com.cognitect/transit-clj "0.8.309"]
-                 [io.netty/netty "4.0.0.Alpha8"]]
+                 [io.netty/netty "3.10.6.Final"]]
 
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.9.0"]
                                   [org.clojure/tools.logging "0.4.1"]

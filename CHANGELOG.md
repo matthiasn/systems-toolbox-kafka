@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.6.18] - 2018-05-23
+### Changed
+- back to netty "3.10.6.Final" because of CVE-2014-0193, CVE-2016-4970
+
 ## [0.6.17] - 2018-05-23
 ### Changed
 - dependencies
